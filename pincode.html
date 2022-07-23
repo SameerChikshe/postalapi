@@ -1,0 +1,92 @@
+<script src="./react.development.js">  </script>
+<script src="./react-dom.development.js">  </script>
+<script src="./babel.js">  </script>
+<script src="./axios.min.js"></script>
+
+<div id="root"></div>
+
+<script type="text/babel">
+    
+
+const App=()=>{
+    const searchTextRef=React.useRef()
+
+const [option,setOption]=React.useState('P')
+const [result,setResult]=React.useState()
+
+   const fnChange=(e)=>{
+setOption(e.target.value)
+    }
+
+
+const fnSearchbypincode=()=>{
+const searchtext=searchTextRef.current.value;
+axios.get(`https://api.postalpincode.in/pincode/${searchtext}`)
+.then((res)=>{
+let result=res.data[0].PostOffice;
+if(result && result.length){
+    setResult(result[0].Region);
+}
+else{
+    setResult('Invalid Input')
+}
+})
+
+.catch((res)=>{
+setResult('Something went wrong')
+})
+}
+
+const fnSearchbyareaname=()=>{
+    const searchtext=searchTextRef.current.value;
+    axios.get(`https://api.postalpincode.in/postoffice/${searchtext}`)
+
+    .then((res)=>{
+ 
+let result=res.data[0].PostOffice;
+if(result && result.length){
+    setResult(result[0].Pincode);
+}
+else{
+    setResult('Invalid Input')
+}
+})
+
+.catch((res)=>{
+setResult('Something went wrong')
+})
+}
+
+
+    return <div>
+    <h1>Postal Address</h1>
+    <p>
+        <input onChange={fnChange} type="radio" checked={option=='P'}name="input" value="P"/> Search by pincode
+        <input onChange={fnChange} type="radio" name="input" value="A"/>Search by Area name
+        </p>
+
+
+      {option =='P' ?
+       <p>
+            Enter Pincode <input ref={searchTextRef}/>
+    <button onClick={fnSearchbypincode}>Submit</button>
+    </p>
+
+    :
+
+    <p>
+            Enter Area name <input ref={searchTextRef}/>
+            <button onClick={fnSearchbyareaname}>Submit</button>
+    </p>
+      }
+
+      <h3>{result}</h3>
+        </div>
+        
+}
+
+
+
+ReactDOM.render(<App />,document.getElementById('root'))
+
+</script>
